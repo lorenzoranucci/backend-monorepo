@@ -1,0 +1,5 @@
+/.github @homeruntech/teams/platform
+/common @homeruntech/teams/platform
+
+/.github/init @homeruntech/teams/platform @homeruntech/sre
+/.github/workflows/apply-setings.yml @homeruntech/teams/platform @homeruntech/sre

@@ -1,0 +1,32 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "defaultBase": "main",
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*",
+      "sharedGlobals"
+    ],
+    "production": [
+      "default"
+    ],
+    "sharedGlobals": [
+      "{workspaceRoot}/go.work"
+    ]
+  },
+  "plugins": [
+    "@nx-go/nx-go"
+  ],
+  "targetDefaults": {
+    "lint": {
+      "executor": "@nx-go/nx-go:lint",
+      "options": {
+        "linter": "golangci-lint run"
+      }
+    }
+  },
+  "pluginsConfig": {
+    "@nx/js": {
+      "projectsAffectedByDependencyUpdates": []
+    }
+  }
+}

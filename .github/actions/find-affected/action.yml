@@ -1,0 +1,71 @@
+name: 'Find affected'
+description: |
+  Find apps and libs that have been affected between two commits
+  If a library is affected, all applications depending on that library are considered indirectly affected.
+inputs:
+  git-ref-before:
+    required: true
+    description: 'The git ref to be used as first argument in the `git diff` command'
+  git-ref-after:
+    required: true
+    description: 'The git ref to be used as second argument in the `git diff` command'
+  github-token:
+    required: true
+  all:
+    description: 'If true, all projects will be considered as affected'
+    required: false
+    default: 'false'
+outputs:
+  affected:
+    description: 'The comma separated list of affected projects. E.g. `quote-domain/pro-jobs,pro-engagement/campaigns,go-lib/cucumber`'
+    value: ${{ steps.find-affected.outputs.affected }}
+  affected-apps:
+    description: 'The comma separated list of affected projects of application type. E.g. `quote-domain/pro-jobs,pro-engagement/campaigns`'
+    value: ${{ steps.find-affected.outputs.affected-apps }}
+  affected-libs:
+    description: 'The comma separated list of affected projects of library type. E.g. `quote-domain/pro-jobs,pro-engagement/campaigns`'
+    value: ${{ steps.find-affected.outputs.affected-libs }}
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '20.x'
+        registry-url: "https://npm.pkg.github.com"
+        scope: "@homeruntech"
+
+    - env:
+        NODE_AUTH_TOKEN: ${{ inputs.github-token }}
+      shell: bash
+      working-directory: ${{ inputs.cdk-app-dir }}
+      run: npm ci
+
+    - id: find-affected
+      shell: bash
+      run: |
+        if [ "${{ inputs.all }}" == "true" ]; then
+          echo "All projects will be considered as affected"
+          affectedAll=$(npx nx show projects --json)
+          affectedApps=$(npx nx show projects --type app --json)
+          affectedLibs=$(npx nx show projects --type lib --json)
+        else
+          gitRefBefore=${{ inputs.git-ref-before }}
+          gitRefAfter=${{ inputs.git-ref-after }}
+        
+          affectedAll=$(npx nx show projects --affected --json --base=$gitRefBefore --head=$gitRefAfter)
+          affectedApps=$(npx nx show projects --affected --type app --json --base=$gitRefBefore --head=$gitRefAfter)
+          affectedLibs=$(npx nx show projects --affected --type lib --json --base=$gitRefBefore --head=$gitRefAfter)
+        fi
+        
+        echo "Affected: $affectedAll"
+        echo "Affected app: $affectedApps"
+        echo "Affected libs: $affectedLibs"
+        
+        echo "affected=$affectedAll" >> $GITHUB_OUTPUT
+        echo "affected-apps=$affectedApps" >> $GITHUB_OUTPUT
+        echo "affected-libs=$affectedLibs" >> $GITHUB_OUTPUT

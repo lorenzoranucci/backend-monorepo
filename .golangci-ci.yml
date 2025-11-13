@@ -1,0 +1,42 @@
+version: "2"
+linters:
+  enable:
+    - gochecknoinits
+    - goconst
+    - gomoddirectives
+    - gosec
+    - unconvert
+    - whitespace
+  settings:
+    gomoddirectives:
+      replace-local: true
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - goconst
+        path: (.+)_test\.go
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gofmt
+    - gofumpt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/homeruntech
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

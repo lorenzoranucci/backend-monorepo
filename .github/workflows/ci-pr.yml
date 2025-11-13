@@ -1,0 +1,92 @@
+name: CI on pull request
+run-name: CI PR "${{ github.event.pull_request.title }}" by @${{ github.actor }}
+
+on:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  # find-affected job identifies the affected projects in the PR.
+  # Only affected projects will be checked in the ci-checks job.
+  find-affected:
+    runs-on: ubuntu-22.04
+    outputs:
+      affected: ${{ steps.find-affected.outputs.affected }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/find-affected
+        name: Find affected projects
+        id: find-affected
+        with:
+          git-ref-before: ${{ github.event.pull_request.base.sha }}
+          git-ref-after: "HEAD"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set affected
+        run: |
+          echo "affected=${{ steps.find-affected.outputs.affected }}" >> $GITHUB_OUTPUT
+
+  affected-pr-comment:
+    needs: find-affected
+    runs-on: ubuntu-22.04
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Get affected projects
+        id: affected
+        run: |
+          projects=$(echo '${{ needs.find-affected.outputs.affected }}' | jq -r '.[]' | sed 's/^/- /')
+          if [ -z "$projects" ]; then
+            echo "projects=None" >> $GITHUB_OUTPUT
+          else
+            echo "projects=- $projects" >> $GITHUB_OUTPUT
+          fi
+      - name: Add or update PR comment
+        uses: mshick/add-pr-comment@v2
+        with:
+          message-id: affected-projects
+          message: |
+            ### 🧩 Affected Projects
+            ${{ steps.affected.outputs.projects }}
+          allow-repeats: false
+
+  # ci-checks job runs checks (linting, tests, etc.) on each affected project identified in the previous job.
+  # It uses a matrix strategy to run checks in parallel for each affected module.
+  ci-checks:
+    needs: [find-affected]
+    if: ${{ needs.find-affected.outputs.affected != '[]' && needs.find-affected.outputs.affected != '' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        project: ${{ fromJson(needs.find-affected.outputs.affected) }}
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/checks
+        name: Checks
+        with:
+          working-directory: ${{ matrix.project }}
+          aws-access-key-id: ${{ secrets['TEST_AWS_ACCESS_KEY_ID'] }}
+          aws-secret-access-key: ${{ secrets['TEST_AWS_SECRET_ACCESS_KEY'] }}
+          aws-region: ${{ secrets['TEST_AWS_REGION'] }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  # check-ci-outcome job ensures that the overall workflow passes if ci-checks job is skipped or successful
+  # ci-checks may be skipped if there are no affected projects
+  check-ci-outcome:
+    needs: ci-checks
+    runs-on: ubuntu-22.04
+    if: always()
+    steps:
+      - id: check-ci-outcome
+        name: Check CI outcome
+        run: |
+          if [[ ${{ needs.ci-checks.result }} == 'success' || ${{ needs.ci-checks.result }} == 'skipped' ]]; then
+            echo "CI succeeded"
+            exit 0
+          else
+            echo "CI failed"
+            exit 1
+          fi

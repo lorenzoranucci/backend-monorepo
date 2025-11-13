@@ -1,0 +1,71 @@
+name: 'CI checks'
+
+inputs:
+  working-directory:
+    description: 'Working directory for the project'
+    required: true
+  aws-access-key-id:
+    required: true
+  aws-secret-access-key:
+    required: true
+  aws-region:
+    required: true
+  github-token:
+    required: true
+
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ inputs.aws-access-key-id }}
+        aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
+        aws-region: ${{ inputs.aws-region }}
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '20.x'
+        registry-url: "https://npm.pkg.github.com"
+        scope: "@homeruntech"
+
+    - env:
+        NODE_AUTH_TOKEN: ${{ inputs.github-token }}
+      shell: bash
+      run: npm ci
+
+    - uses: actions/setup-go@v5
+      with:
+        go-version: '1.25.0'
+        cache-dependency-path: ${{ inputs.working-directory }}/go.sum
+
+    # Restore cache dir for golangci-lint, go tests and go build.
+    # The cache is saved by this action itself.
+    #- uses: actions/cache/restore@v4
+    #  with:
+    #    path: |
+    #      ~/.cache
+    #    key: cache-${{ runner.os }}-pr-${{ inputs.working-directory }}-${{ github.event.number }}-
+    #    restore-keys: |
+    #      cache-${{ runner.os }}-main-${{ inputs.working-directory }}-
+
+    - name: lint
+      shell: bash
+      run: |
+        curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.4.0
+        
+        npx nx run-many --target=lint --projects=${{ inputs.working-directory }} --parallel=1 --skip-nx-cache
+
+    - name: test
+      shell: bash
+      run: npx nx run-many --target=test --projects=${{ inputs.working-directory }} --parallel=1 --skip-nx-cache
+
+    #- uses: actions/cache/save@v4
+    #  if: always()
+    #  with:
+    #    path: |
+    #      ~/.cache
+    #    key: cache-${{ runner.os }}-${{ inputs.workflow }}-${{ inputs.working-directory }}-${{ github.event.number }}-${{ github.run_id }}
