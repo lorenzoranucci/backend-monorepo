@@ -23,10 +23,5 @@
         "linter": "golangci-lint run"
       }
     }
-  },
-  "pluginsConfig": {
-    "@nx/js": {
-      "projectsAffectedByDependencyUpdates": []
-    }
   }
 }
