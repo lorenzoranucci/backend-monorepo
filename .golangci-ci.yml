@@ -33,7 +33,7 @@ formatters:
   settings:
     goimports:
       local-prefixes:
-        - github.com/homeruntech
+        - github.com/lorenzoranucci
   exclusions:
     generated: lax
     paths:

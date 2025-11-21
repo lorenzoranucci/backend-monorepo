@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/homeruntech/backend-monorepo/quote-domain/shared/go-lib/printer"
-	http2 "github.com/homeruntech/backend-monorepo/shared/go-lib/http"
+	"github.com/lorenzoranucci/backend-monorepo/quote-domain/shared/go-lib/printer"
+	http2 "github.com/lorenzoranucci/backend-monorepo/shared/go-lib/http"
 )
 
 func helloWorldHandler(w http.ResponseWriter, r *http.Request) {

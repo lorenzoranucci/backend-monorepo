@@ -10,7 +10,7 @@
       "default"
     ],
     "sharedGlobals": [
-      "{workspaceRoot}/go.work"
+      "{workspaceRoot}/go.mod"
     ]
   },
   "plugins": [

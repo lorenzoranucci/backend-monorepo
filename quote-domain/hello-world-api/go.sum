@@ -1,4 +1,0 @@
-github.com/homeruntech/backend-monorepo/quote-domain/shared/go-lib/printer v0.0.0-20251112142951-ce316e1eca15 h1:cBxuLCuzUbRtoTg3bXind0cWFvlmk4W67XESTzMjUzk=
-github.com/homeruntech/backend-monorepo/quote-domain/shared/go-lib/printer v0.0.0-20251112142951-ce316e1eca15/go.mod h1:aKbAFSgOIKL6Q+BiXbt7mTnfgT7UKNoSmELeTZKu1Lo=
-github.com/homeruntech/backend-monorepo/shared/go-lib/http v0.0.0-20251112142951-ce316e1eca15 h1:tZueJB3X+x/UQVetcpv818ZV9/CG9JDhGXTeMUm+/tw=
-github.com/homeruntech/backend-monorepo/shared/go-lib/http v0.0.0-20251112142951-ce316e1eca15/go.mod h1:SyzQkxebXWk5l01k8gMNmUKn4kODjEtbrq7Lp2YObfw=
