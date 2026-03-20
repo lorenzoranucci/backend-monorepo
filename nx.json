@@ -1,6 +1,8 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "defaultBase": "main",
+  "affected": {
+    "defaultBase": "main"
+  },
   "namedInputs": {
     "default": [
       "{projectRoot}/**/*",
@@ -14,7 +16,9 @@
     ]
   },
   "plugins": [
-    "@nx-go/nx-go"
+    {
+      "plugin": "@nx-go/nx-go"
+    }
   ],
   "targetDefaults": {
     "lint": {
@@ -22,6 +26,18 @@
       "options": {
         "linter": "golangci-lint run"
       }
+    },
+    "test": {
+      "executor": "@nx-go/nx-go:test",
+      "options": {
+        "race": true
+      }
     }
-  }
+  },
+  "pluginsConfig": {
+    "@nx/js": {
+      "projectsAffectedByDependencyUpdates": []
+    }
+  },
+  "analytics": false
 }
