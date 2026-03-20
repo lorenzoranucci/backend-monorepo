@@ -1,18 +1,23 @@
 {
-  "name": "backend-monorepo-public",
-  "version": "0.1.0",
+  "name": "@nx-go/playground",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {
+    "build": "nx run-many -t build",
+    "lint": "nx run-many -t lint",
+    "test": "nx run-many -t test",
+    "affected:lint": "nx affected:lint",
+    "affected:dep-graph": "nx affected:dep-graph",
+    "format:write": "nx format:write",
+    "format:check": "nx format:check",
+    "update": "nx migrate latest",
+    "dep-graph": "nx dep-graph"
+  },
+  "private": true,
   "devDependencies": {
     "@nx-go/nx-go": "4.0.0-beta.0",
-    "@nx/workspace": "22.6.0",
-    "nx": "22.6.0",
-    "@types/node": "^20.11.14",
-    "jest": "^29.7.0",
-    "semver": "^7.6.2",
-    "ts-node": "^10.9.2",
-    "typescript": "~5.3.3"
-  },
-  "dependencies": {
-    "constructs": "^10.0.0",
-    "source-map-support": "^0.5.21"
+    "@nx/workspace": "22.5.1",
+    "nx": "22.5.1",
+    "prettier": "^3.8.1"
   }
 }

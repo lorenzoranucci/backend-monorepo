@@ -17,27 +17,16 @@
   },
   "plugins": [
     {
-      "plugin": "@nx-go/nx-go"
+      "plugin": "@nx-go/nx-go",
+      "options": {
+        "buildTargetName": "build",
+        "serveTargetName": "serve",
+        "testTargetName": "test",
+        "lintTargetName": "lint",
+        "tidyTargetName": "tidy",
+        "generateTargetName": "generate"
+      }
     }
   ],
-  "targetDefaults": {
-    "lint": {
-      "executor": "@nx-go/nx-go:lint",
-      "options": {
-        "linter": "golangci-lint run"
-      }
-    },
-    "test": {
-      "executor": "@nx-go/nx-go:test",
-      "options": {
-        "race": true
-      }
-    }
-  },
-  "pluginsConfig": {
-    "@nx/js": {
-      "projectsAffectedByDependencyUpdates": []
-    }
-  },
   "analytics": false
 }
