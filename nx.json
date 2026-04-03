@@ -4,15 +4,17 @@
     "defaultBase": "main"
   },
   "namedInputs": {
-    "default": [
-      "{projectRoot}/**/*",
-      "sharedGlobals"
-    ],
-    "production": [
-      "default"
-    ],
-    "sharedGlobals": [
-      "{workspaceRoot}/go.mod"
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "production": ["default"],
+    "sharedGlobals": [],
+    "golang": [
+      "{projectRoot}/go.mod",
+      "{projectRoot}/go.sum",
+      "{projectRoot}/**/*.go",
+      "{workspaceRoot}/go.mod",
+      "{workspaceRoot}/go.sum",
+      "{workspaceRoot}/go.work",
+      "{workspaceRoot}/go.work.sum"
     ]
   },
   "plugins": [
