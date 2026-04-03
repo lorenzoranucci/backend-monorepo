@@ -6,11 +6,14 @@
   "tags": [],
   "targets": {
     "test": {
-      "executor": "@nx-go/nx-go:test"
+      "executor": "@nx-go/nx-go:test",
+      "cache": true,
+      "inputs": ["golang"]
     },
     "lint": {
-      "executor": "@nx-go/nx-go:lint"
+      "executor": "@nx-go/nx-go:lint",
+      "cache": true,
+      "inputs": ["golang"]
     }
   }
 }
-
